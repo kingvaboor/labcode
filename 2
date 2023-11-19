@@ -582,3 +582,118 @@ int main(){
             cout << proc << " ";
     }
 }
+
+2nd Algo 
+
+#include <stdio.h>
+
+int need[100][100], allocated[100][100], max[100][100];
+int work[100], available[100], safe_seq[100];
+int processes, resources;
+int finish[100];
+
+int main() {
+    printf("Enter number of processes: ");
+    scanf("%d", &processes);
+    printf("Enter total number of resources: ");
+    scanf("%d", &resources);
+
+    for (int i = 0; i < processes; i++) {
+        finish[i] = 0;
+    }
+
+    printf("Enter allocation matrix:\n");
+    for (int i = 0; i < processes; i++) {
+        for (int j = 0; j < resources; j++) {
+            scanf("%d", &allocated[i][j]);
+        }
+    }
+
+    printf("Enter max matrix:\n");
+    for (int i = 0; i < processes; i++) {
+        for (int j = 0; j < resources; j++) {
+            scanf("%d", &max[i][j]);
+        }
+    }
+
+    printf("Enter available matrix:\n");
+    for (int i = 0; i < resources; i++) {
+        scanf("%d", &available[i]);
+        work[i] = available[i];
+    }
+
+    for (int i = 0; i < processes; i++) {
+        for (int j = 0; j < resources; j++) {
+            need[i][j] = max[i][j] - allocated[i][j];
+        }
+    }
+
+    int cnt = 0;
+    int flag = 1;
+
+    // Main loop to find a safe sequence of processes
+while (flag) {
+    // Reset the flag for each iteration
+    flag = 0;
+
+    // Iterate through each process
+    for (int i = 0; i < processes; i++) {
+        // Check if the process i is not yet finished
+        if (finish[i] == 0) {
+            int j;
+
+            // Iterate through each resource to check resource availability
+            for (j = 0; j < resources; j++) {
+                // Check if the resources needed by process i can be satisfied
+                if (need[i][j] > work[j]) {
+                    break; // Break the loop if resources are insufficient
+                }
+            }
+
+            // If the loop completed without breaking, all resources are available
+            if (j == resources) {
+                // Update available resources by adding allocated resources of process i
+                for (int z = 0; z < resources; z++) {
+                    work[z] += allocated[i][z];
+                }
+
+                // Mark process i as finished
+                finish[i] = 1;
+
+                // Record process i in the safe sequence
+                safe_seq[cnt] = i;
+
+                // Increment the count of processes in the safe sequence
+                cnt++;
+
+                // Set flag to 1, indicating a process was added to the safe sequence
+                flag = 1;
+            }
+        }
+    }
+}
+
+    int safe = 1;
+    for (int i = 0; i < processes; i++) {
+        if (finish[i] == 0) {
+            safe = 0;
+        }
+    }
+
+    if (safe) {
+        printf("The system is in a safe state!\n");
+        printf("Safe Sequence is: ");
+        for (int i = 0; i < processes; i++) {
+            printf("P%d", safe_seq[i]);
+            if (i != processes - 1) {
+                printf(" -> ");
+            }
+        }
+        printf("\n");
+    } else {
+        printf("The system is in an unsafe state!\n");
+    }
+
+    return 0;
+}
+
