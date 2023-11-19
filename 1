@@ -1,0 +1,669 @@
+Linux Commands
+
+______LINUX COMMANDS______
+
+	passwd - Create or update passwords for existing users
+	
+	date - for date :: date -r <file_name> :: last modification time of file
+					:: date -d "+7 days"
+					:: date -d "2023-11-2" "+%A" :: accessing a particular thing in date "+%B"
+	
+	wc :: -l (or --lines): Counts the number of lines in the file.
+		  -w (or --words): Counts the number of words in the file. Words are typically defined as sequences of characters separated by whitespace.
+		  -c (or --bytes): Counts the number of bytes in the file.
+		  -m (or --chars): Counts the number of characters in the file. This can be different from bytes in multi-byte character encodings like UTF-8.
+		  -L (or --max-line-length): Prints the length of the longest line in the file.
+	
+	nl :: nl <file_name> prints number of lines actually written
+	
+	tail :: tail -n <num> <file_name> :: prints the last n lines of file
+	
+	who :: lists users in the system
+		:: who --count :: number of users in the system
+		:: who -H
+	
+	cat > myfile.txt ::  creates myfile and opens
+	cat file :: view file
+	touch myfile.txt :: creates file
+	
+	man date > mydate: This command redirects the output of the man date command to a file named "mydate."
+					   If the "mydate" file already exists, using > will overwrite its contents with the output from the man date command. If "mydate" does not exist, it will be created.
+	man date >> mydate: This command appends the output of the man date command to a file named "mydate."
+						If the "mydate" file already exists, using >> will add the output from the man date command to the end of the file without affecting its existing contents. If "mydate" does not exist, it will be created.
+	
+	../ -> prev dir
+	./ -> curr dir
+	
+	mv <file_name>  path/<new_file_name>
+	mv source_directory/* destination_directory/
+	mv * dir/
+	
+	cp source_dir/<file_name> dest/<[new/exist]_file_name>
+	
+	ls :Performs a long listing, showing detailed information about each file and directory, including permissions, owner, group, file size, modification time, and more.
+	   -a: Lists all files, including hidden files (those that start with a dot .).
+	   -h: Human-readable format for file sizes, displaying sizes in a more user-friendly format (e.g., "1.5K" instead of bytes).
+	   -t: Sorts files by modification time, with the most recently modified files appearing first.
+	   -r: Reverses the order of the file list.
+	   -R: Recursively lists the contents of subdirectories.
+	
+	pwd
+	head -n <num> <file_name>  ........first n lines of file
+	tail -n <num> <file_name> .........last n ------|-------
+	
+	cat f1 f2 f3 >> f0 .......appendning contents of files to f0
+	
+	
+	grep "pattern" filename :: lists lines with that pattern
+	
+	# Perform a case-insensitive search for the word "example" in the file "sample.txt"
+	grep -i "example" sample.txt
+
+	# Count the number of occurrences of "error" in a log file
+	grep -c "error" logfile.log
+
+	# List files containing the word "keyword" in a directory and its subdirectories
+	grep -rl "keyword" /path/to/directory
+
+	# Display matching lines with line numbers
+	grep -n "pattern" file.txt
+
+	# Print only the matching part of each line
+	grep -o "pattern" data.txt
+
+	# Search for multiple patterns in a file
+	grep -e "pattern1" -e "pattern2" file.txt
+
+	# Perform a recursive search for the word "searchme" in all text files within a directory
+	grep -r "searchme" /path/to/directory/*.txt
+	
+	# Basic pattern matching
+	grep "error" access.log
+
+	# Lines starting with a specific word
+	grep "^start" data.txt
+
+	# Lines ending with a particular word
+	grep "end$" data.txt
+
+	# Excluding lines with a specific word
+	grep -v "exclude" file.txt
+
+	# Matching variations in spelling
+	grep "colou?r" text.txt
+
+	# Matching email addresses
+	grep -E -o "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}" emails.txt
+
+	# Lines containing a specific character
+	grep "@" contacts.txt
+
+	# Multiple patterns using OR logic
+	grep -e "pattern1" -e "pattern2" data.txt
+
+	# Multiple patterns using AND logic
+	grep "pattern1" file.txt | grep "pattern2"
+
+	# Date range in log file
+	grep -E "2023-11-01|2023-11-30" access.log
+
+	# Extracting lines between two patterns and searching for a specific pattern
+	sed -n '/start_pattern/,/end_pattern/p' data.txt | grep "desired_pattern"
+	
+	grep -o -E '\b\w{4}\b' mydate    --- size of word wale
+	sed -i 's/\boldword\b/newword/g' filename
+
+	paste -d "-" capitals1 capitals2 | cat > file 
+	cut -d ":" -f1,3 f_name :: cut the files whose words are separated by ':' and print cols 1,3  
+		
+	# Capture the output of a command and save it to a file
+	ls | tee file.txt
+
+	# Append output to an existing file
+	echo "New data" | tee -a existing_file.txt
+
+	# Save the output to multiple files
+	cat data.txt | tee file1.txt file2.txt
+
+	# Use tee with other commands in a pipeline
+	ls -l | grep "pattern" | tee results.txt
+
+	# Redirect error messages and standard output to different files using tee
+	some_command 2> errors.txt | tee output.txt
+
+	ls -l | awk '{print $5}'
+	
+	# Convert text to uppercase
+	echo "hello, world" | tr '[:lower:]' '[:upper:]'
+
+	# Delete specific characters (spaces)
+	echo "remove all spaces" | tr -d ' '
+
+	# Squeeze consecutive spaces into one
+	echo "squeeze    these   spaces" | tr -s ' '	
+
+	# Replace characters (spaces with underscores)
+	echo "replace spaces" | tr ' ' '_'
+
+	# Translate digits to Roman numerals
+	echo "12345" | tr '0-9' 'IVXLCDM'
+
+	# ROT13 encryption/decryption
+	echo "Hello, World" | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+
+	# Strip non-alphanumeric characters
+	echo "clean up text!123" | tr -cd '[:alnum:]'
+
+	# Convert CSV to TSV (replace commas with tabs)
+	echo "a,b,c" | tr ',' '\t'
+
+	tr '[:lower:]' '[:upper:]' < mystates > mystates_uppercase
+	tr 'oldword' 'newword' < mystates > mystates_uppercase
+	------------------------------------------------------------------------------------------
+	# Compare and display unique lines in two files
+	comm -3 <(sort file1.txt) <(sort file2.txt)
+
+	# Find common lines between two files
+	comm -12 <(sort file1.txt) <(sort file2.txt)
+
+	# Display unique lines and common lines with prefixes
+	comm -3 -1 -2 <(sort file1.txt) <(sort file2.txt) | sed -e 's/^/1 /' -e 's/\t/ /'
+
+	# Check if two files are identical
+	comm <(sort file1.txt) <(sort file2.txt)
+
+	# Compare files with different sort orders
+	comm -12 <(sort file1.txt) file2.txt
+
+	# Analyze differences in log files
+	comm -3 <(sort log1.txt) <(sort log2.txt)
+
+	# Data validation and deduplication
+	comm -2 -3 <(sort data.txt) <(sort data2.txt)
+
+	# Scripting and automation
+	comm -12 <(sort script1.sh) <(sort script2.sh)
+
+	# Database record comparison
+	comm -3 <(sort records1.csv) <(sort records2.csv)
+
+	# Generating reports on data discrepancies
+	comm -3 <(sort data1.txt) <(sort data2.txt)
+
+	# Version control systems (example with Git)
+	git diff --no-index -- file1.txt file2.txt
+
+_______Shell Scripting________
+
+
+Basic Bash Scripting
+
+1. Arithmetic operations
+#!/bin/bash
+#REMEMBER expr == $()
+#using expr (deprecated..but used for simple arithematic...remember to give space in
+operand and +)
+num1=10
+num2=12
+echo "Sum is expr $num1 + $num2"
+#using $()
+num1=9
+num2=4
+echo "SUM is $(expr $num1 + $num2)"
+#using $(()) ... for complex calculations
+num1=4
+num2=8
+sum=$((num1+num2*num2*num1))
+echo SUM IS $sum
+#using floating arithematic
+num1=10.5
+num2=2.5
+result=$(echo "$num1 + $num2" | bc)
+echo "Result: $result"
+#using let
+num1=9
+num2=3
+let "div = num1 / num2"
+echo $div
+#using $[]
+num1=7
+num2=6
+echo $[$num1*$num2]
+OUTPUT SCREENSHOT:
+
+
+2. Control Structures
+a. IF ELSE FI
+#!/bin/bash
+grade=85
+if [ $grade -ge 90 ]; then
+ echo "A"
+elif test $grade -ge 80 ; then
+ echo "B"
+else
+ echo "C or below"
+fi
+b. Switch Case
+#!/bin/bash
+day="Tuesday"
+case $day in
+ "Monday")
+ echo "Day 1"
+ ;;
+ "Tuesday")
+ echo "Day 2"
+ ;;
+ "Wednesday")
+ echo "Day 3"
+ ;;
+ "Thursday")
+ echo "Day 4"
+ ;;
+ "Friday")
+ echo "Day 5"
+ ;;
+ "Saturday"|"Sunday")
+ echo "Weekend"
+ ;;
+ *)
+ echo "Unknown"
+ ;;
+esac
+# other type of switch case that can be used
+echo -e "To know information about a key\n"
+read -n1 -p "Hit a key: " key
+case "$key" in
+[a-z])
+ echo -e "\n$key is a lower case."
+ ;;
+[A-Z])
+ echo -e "\n$key is an upper case."
+ ;;
+[0-9])
+ echo -e "\n$key is a number."
+ ;;
+*)
+ echo -e "\n$key is a punctuation."
+ ;;
+esac
+
+
+3. LOOPS
+a. FOR LOOP
+#!/bin/bash
+#nested
+for i in {1..3}
+do
+ for j in {1..2}
+ do
+ echo "Outer loop: $i, Inner loop: $j"
+ done
+done
+#array
+fruits=("apple" "banana" "orange")
+for fruit in "${fruits[@]}"
+do
+ echo "Fruit: $fruit"
+done
+#range
+for num in {1..5}
+do
+ echo "Number: $num"
+done
+#file
+for file in *.txt
+do
+ echo "Processing file: $file"
+done
+#C-like loop
+for (( i=1; i<=5; i++ ))
+do
+ echo "Iteration: $i"
+done
+b. WHILE
+#!/bin/bash
+count=1
+while [ $count -le 5 ]
+do
+ echo "Count: $count"
+ count=$((count + 1))
+done
+input=""
+while [ "$input" != "quit" ]
+do
+ echo "Enter 'quit' to exit:"
+ read input
+done
+count=1
+while [ $count -le 5 ]
+do
+ echo "Count: $count"
+ count=$((count + 1))
+done
+c. UNTIL
+
+
+#!/bin/bash
+echo "Enter a number: "
+read x
+echo ; echo Count Down
+until [ "$x" -le 0 ]
+do
+ echo $x
+x=expr $x - 1
+sleep 1
+done
+echo ; echo GO !
+
+
+4. STRING OPERATIONS
+#!/bin/bash
+# Concatenation
+first_name="John"
+last_name="Doe"
+full_name="$first_name $last_name"
+echo "Full Name: $full_name"
+# String Length
+string="Hello, world!"
+length=${#string}
+echo "Length: $length"
+# Substring Extraction
+text="Bash scripting is fun"
+substring=${text:5:9}
+echo "Substring: $substring"
+# Substring Removal (from the beginning)
+path="/home/user/documents"
+stripped_path=${path#*/}
+echo "Stripped Path: $stripped_path"
+# Substring Removal (from the end)
+filename="script.sh"
+base_name=${filename%.sh}
+echo "Base Name: $base_name"
+# Search and Replace
+sentence="I like apples and oranges"
+modified_sentence=${sentence//apples/bananas}
+echo "Modified Sentence: $modified_sentence"
+# String Comparison
+string1="hello"
+string2="world"
+if [ "$string1" = "$string2" ]; then
+ echo "Strings are equal"
+else
+ echo "Strings are not equal"
+fi
+# Uppercase and Lowercase Conversion
+name="Alice"
+uppercase_name=${name^^}
+lowercase_name=${name,,}
+echo "Uppercase: $uppercase_name, Lowercase: $lowercase_name"
+5. COMMAND LINE ARGUMENTS
+#!/bin/bash
+#read keyword
+# -s makes silent input(not visible on screen
+# -t timeout
+# -p prompt
+# -r to not use \ as escape characters
+#for echo -n prevent newline, -e enables escape characters, E disables them
+read -s -t 30 -p "Enter your password: " password
+echo -e "\n$password"
+#CLA
+#$0: The script's name or the command used to invoke it.
+#$1, $2, $3, ...: The first, second, third, and so on, command-line arguments.
+#$#: The total number of command-line arguments.
+#$@: All command-line arguments as separate quoted strings.
+#$*: All command-line arguments as a single quoted string.
+echo $*
+#!/bin/bash
+grade=85
+if [ $grade -ge 90 ]; then
+ echo "A"
+elif test $grade -ge 80 ; then
+ echo "B"
+else
+ echo "C or below"
+fi
+
+
+6. FUNCTIONS
+#!/bin/bash
+# Define a function
+greet() {
+ local name="$1" # Get the first argument
+ echo "Hello, $name!"
+}
+# Call the function
+greet "Alice"
+greet "Bob"
+7. ARRAY OPERATIONS
+#!/bin/bash
+# Declare an array
+my_array=("apple" "banana" "cherry")
+# Access array elements
+echo "First element: ${my_array[0]}"
+echo "Second element: ${my_array[1]}"
+echo "Third element: ${my_array[2]}"
+# Length of the array
+length=${#my_array[@]}
+echo "Length of array: $length"
+# Iterate over array elements
+echo "Array elements:"
+for element in "${my_array[@]}"; do
+ echo "$element"
+done
+# Add elements to the array
+my_array+=("grape")
+my_array[4]="orange"
+# Print modified array
+echo "Modified array:"
+for element in "${my_array[@]}"; do
+ echo "$element"
+done
+# Remove elements from the array
+unset my_array[2] # Removes the third element
+# Print array after removal
+echo "Array after removal:"
+for element in "${my_array[@]}"; do
+ echo "$element"
+done
+# Extract a slice of the array
+slice=("${my_array[@]:1:2}")
+echo "Slice of array:"
+for element in "${slice[@]}"; do
+ echo "$element"
+done
+# Search for an element in the array
+search_element="banana"
+for element in "${my_array[@]}"; do
+ if [ "$element" == "$search_element" ]; then
+ echo "$search_element found in the array."
+ break
+ fi
+done
+
+ASSIGNMENT-2(B)
+Additional Problems given on Bash Scripting
+1. To print reverse of a given number
+#!/bin/bash
+# Function to reverse a number
+reverse_number() {
+ local num="$1"
+ local reversed=""
+ while [ "$num" -gt 0 ]; do
+ remainder=$((num % 10))
+ reversed="${reversed}${remainder}"
+ num=$((num / 10))
+ done
+ echo "$reversed"
+}
+# Read input from the user
+read -p "Enter a number: " input_number
+# Call the function to get the reverse
+reversed_number=$(reverse_number "$input_number")
+echo "Reverse of $input_number is $reversed_number"
+2. To check and count occurences of a substring in a given string using command line
+arguments
+#!/bin/bash
+string="$1" # Get the input string from the first command line argument
+substring="$2" # Get the substring from the second command line argument
+count=0 # Initialize the count of occurrences
+# Loop through the string and count occurrences of the substring
+while [[ "$string" == "$substring" ]]; do
+ string="${string#*$substring}" # Remove the part before the first occurrence
+ ((count++)) # Increment the count
+done
+echo "Substring '$substring' appears $count times in the string."
+3. To check whether given number is prime or not
+#!/bin/bash
+# Function to check if a number is prime
+check_prime() {
+ local number=$1
+ # Check if the number is less than 2 (not prime)
+ if [ $number -lt 2 ]; then
+ echo "$number is not a prime number."
+ return 1
+ fi
+ # Check for factors from 2 to the square root of the number
+ for ((i = 2; i <= $((number / 2)); i++)); do
+ if [ $((number % i)) -eq 0 ]; then
+ echo "$number is not a prime number."
+ return 1
+ fi
+ done
+ echo "$number is a prime number."
+ return 0
+}
+# Read input number from the user
+read -p "Enter a number: " input_number
+# Call the function and pass the input number
+check_prime "$input_number"
+4. To check whether a string is palindrome or not
+#!/bin/bash
+# Function to check if a string is a palindrome
+check_palindrome() {
+ local input_string="$1"
+ # Remove spaces and convert to lowercase
+ cleaned_string=$(echo "$input_string" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+ # Reverse the string
+ reversed_string=$(echo "$cleaned_string" | rev)
+ # Check if the original and reversed strings are the same
+ if [ "$cleaned_string" == "$reversed_string" ]; then
+ echo "The string is a palindrome."
+ return 0
+ else
+ echo "The string is not a palindrome."
+ return 1
+ fi
+}
+# Read input string from the user
+read -p "Enter a string: " input_string
+# Call the function and pass the input string
+check_palindrome "$input_string"
+5. Write a Program to print the factorial of a number
+#!/bin/bash
+# Define a recursive factorial function
+factorial() {
+ local num="$1"
+ if [ "$num" -eq 0 ]; then
+ echo 1
+ else
+ local smaller_factorial=$((num - 1))
+ local smaller_result=$(factorial "$smaller_factorial")
+ echo $((num * smaller_result))
+ fi
+}
+# Calculate and print the factorial of 5
+result=$(factorial 5)
+echo "Factorial of 5: $result"
+6. Program to check whether an argument is positive or not.
+#!/bin/bash
+# Check if an argument is provided
+if [ $# -ne 1 ]; then
+ echo "Usage: $0 <number>"
+ exit 1
+fi
+# Read the argument
+number=$1
+# Check if the number is positive
+if [ $number -gt 0 ]; then
+ echo "$number is
+a positive number."
+else
+ echo "$number is not a positive number."
+fi
+7. Check whether password set by the user is strong or not
+#!/bin/bash
+# Check if no argument is provided
+if [ $# -eq 0 ]; then
+ echo "Usage: $0 <password>"
+ exit 1
+fi
+# Read the password as the input string
+password="$1"
+# Define function to check if a password is strong
+is_strong_password() {
+ local length=${#1}
+ local has_lower=0
+ local has_upper=0
+ local has_digit=0
+ local has_special=0
+ if [ $length -lt 8 ]; then
+ return 1 # Password is too short
+ fi
+ for (( i=0; i<$length; i++ )); do
+ char="${1:i:1}"
+ if [[ $char =~ [a-z] ]]; then
+ has_lower=1
+ elif [[ $char =~ [A-Z] ]]; then
+ has_upper=1
+ elif [[ $char =~ [0-9] ]]; then
+ has_digit=1
+ else
+ has_special=1
+ fi
+ done
+ # Check all criteria
+ if [ $has_lower -eq 1 ] && [ $has_upper -eq 1 ] && [ $has_digit -eq 1 ] && [
+$has_special -eq 1 ]; then
+ return 0 # Password is strong
+ else
+ return 2 # Password is weak
+ fi
+}
+# Invoke the function and check the result
+is_strong_password "$password"
+case $? in
+ 0)
+ echo "Strong password!"
+ ;;
+ 1)
+ echo "Password is too short. Please use at least 8 characters."
+ ;;
+ 2)
+ echo "Password is weak. Make sure to include lowercase, uppercase, digits, and
+special characters."
+ ;;
+esac
+
+Sorting Array
+#! /bin/bash
+
+read -p "enter array: " -a arr
+
+        size=${#arr[@]}
+        for (( i = 0 ; i < size ; i++))
+        do
+                for (( j = i; j < size ; j++))
+                do
+                        if [ ${arr[$j]} -lt ${arr[$i]} ] ; then
+                                 int=${arr[$j]}
+                                 arr[$j]=${arr[$i]}
+                                 arr[$i]=$int
+                        fi
+                done
+        done
+
+        for int in ${arr[@]}
+        do
+                echo "$int "
+       done
+
