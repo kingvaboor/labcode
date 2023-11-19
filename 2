@@ -1,0 +1,584 @@
+CPU scheduling 
+1) FCFS 
+#include <iostream>
+#include <vector>
+#include <algorithm> // for std::sort
+using namespace std;
+
+struct Process {
+    int id;
+    int arrivaltime;
+    int bursttime;
+    int completiontime;
+    int turnaroundtime;
+    int waitingtime;
+    bool completed;
+};
+
+void fcfs(vector<Process> &processes){
+    int currenttime {0};
+   for(int i = 0; i < processes.size(); i++){
+        Process* currentProc = &processes[i];
+        for(int j = 0; j < processes.size(); j++){
+            if(processes[j].arrivaltime <= currenttime && !processes[j].completed && currentProc->arrivaltime > processes[j].arrivaltime){
+                currentProc = &processes[j];
+            }
+        }
+        if(currenttime < currentProc->arrivaltime)
+            currenttime = currentProc->arrivaltime;
+
+        currenttime += currentProc->bursttime;
+        currentProc->completiontime = currenttime;
+        currentProc->turnaroundtime = currenttime - currentProc->arrivaltime;
+        currentProc->waitingtime = currentProc->turnaroundtime - currentProc->bursttime;
+        currentProc->completed = true;
+
+        cout << "Process id: " << currentProc->id << endl
+             << "Process arr: " << currentProc->arrivaltime << endl
+             << "Process burst: " << currentProc->bursttime << endl
+             << "Process completion: " << currentProc->completiontime << endl
+             << "Process turnaround: " << currentProc->turnaroundtime << endl
+             << "Process waiting: " << currentProc->waitingtime << endl << endl;
+    }   
+}
+
+int main() {
+    int n;
+    float AverageWT = 0;
+    float AverageTAT = 0;
+    cout << "Enter the number of processes: ";
+    cin >> n;
+
+    vector<Process> processes(n);
+
+    cout << "Enter arrival times and burst times for each process:\n";
+    for (int i = 0; i < n; ++i) {
+        processes[i].id = i + 1;
+        cout << "Process " << i + 1 << " Arrival Time: ";
+        cin >> processes[i].arrivaltime;
+        cout << "Process " << i + 1 << " Burst Time: ";
+        cin >> processes[i].bursttime;
+        processes[i].completed = false;
+    }
+    // Perform FCFS scheduling
+    fcfs(processes);
+
+    // Display the scheduling results
+    cout << "\nProcess\tArrival Time\tBurst Time\tCompletion Time\tTurnaround Time\tWaiting Time\n";
+    for (Process& process : processes) {
+        AverageWT += process.waitingtime;
+        AverageTAT += process.turnaroundtime;
+
+        cout << process.id << "\t" << process.arrivaltime << "\t\t" << process.bursttime << "\t\t"
+             << process.completiontime << "\t\t" << process.turnaroundtime << "\t\t" << process.waitingtime << "\n";
+    }
+
+    cout << "\nAverage Waiting Time is " << AverageWT / n << "\n";
+    cout << "Average Turnaround Time is " << AverageTAT / n << "\n";
+    return 0;
+}
+2) SJF
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+
+struct process{
+    int id;
+    int arrival;
+    int burst;
+    int completion;
+    int turnaround;
+    int waiting;
+    bool completed;
+
+    //constructor for process
+    process(int _id, int _arrival, int _burst) : id(_id) ,arrival(_arrival), burst(_burst)
+    , completed(false) {}
+};
+
+
+int sjf(vector<process> &processes){
+    int currenttime = 0;
+    process* currentproc = NULL;
+    int min_burst;
+    for(int i = 0; i < processes.size(); i++){
+        min_burst = INT32_MAX;
+        for(int j = 0; j < processes.size(); j++){
+            if(processes[j].arrival <= currenttime && min_burst > processes[j].burst && !processes[j].completed){
+                min_burst = processes[j].burst;
+                currentproc = &processes[j];
+            }
+        }
+
+        if(currenttime < currentproc->arrival)
+            currenttime = currentproc->arrival;
+        
+        currenttime += currentproc->burst;
+        currentproc->completion = currenttime;
+        currentproc->turnaround = currenttime - currentproc->arrival;
+        currentproc->waiting = currentproc->turnaround - currentproc->burst;
+        currentproc->completed = true;
+    }
+
+    cout << "Id\tAT\tBT\tCT\tTAT\tWT\n";
+    for(process &p : processes){
+        cout << p.id << "\t" << p.arrival << "\t" << p.burst << "\t" << p.completion << "\t"
+        << p.turnaround << "\t" << p.waiting << "\n";
+    }
+}
+
+int main(){
+
+    int n;
+    cout << "Enter num of processes: ";
+    cin >> n;
+
+    vector<process> processes;
+    processes.reserve(n);
+
+    int arr, burst;
+    for(int i = 0; i < n; i++){
+        cout << "Enter process " << i << " arrival and burst time: ";
+        cin >> arr >> burst;
+        processes.emplace_back(i,arr,burst);
+    }
+    sjf(processes);
+}
+3) SRTF
+#include<iostream>
+#include<vector>
+using namespace std;
+
+struct process{
+    int id;
+    int arrival;
+    int burst;
+    int completion;
+    int remaining;
+    int waiting;
+    int turnaround;
+    bool completed;
+
+    process(int _id, int _arrival, int _burst) : id(_id), arrival(_arrival), burst(_burst), remaining(_burst), 
+    waiting(0), turnaround(0), completed(false) {}
+};
+
+void srtf(vector<process> &processes){
+    int currenttime = 0;
+    process* currentproc = NULL;
+    int min_burst;
+    int completed_processes = 0;
+
+    while (completed_processes < processes.size()) {
+        currentproc = NULL;
+        int min_burst = INT32_MAX;
+
+        for (int i = 0; i < processes.size(); i++) {
+            if (!processes[i].completed && processes[i].remaining > 0 && processes[i].arrival <= currenttime) {
+                if (processes[i].remaining < min_burst) {
+                    min_burst = processes[i].remaining;
+                    currentproc = &processes[i];
+                }
+            }
+        }
+
+        if (currentproc == NULL) {
+            cout << "Idle(" << currenttime << " -> " << currenttime + 1 << ")\n";
+            currenttime++;
+        } else {
+            currentproc->remaining--;
+            currenttime++;
+
+            if (currentproc->remaining == 0) {
+                currentproc->completion = currenttime;
+                currentproc->turnaround = currentproc->completion - currentproc->arrival;
+                currentproc->waiting = currentproc->turnaround - currentproc->burst;
+                currentproc->completed = true;
+                completed_processes++;
+            }
+        }
+    }
+
+    int avgWT = 0;
+    int avgTAT = 0;
+
+    cout << "Id\tAT\tBT\tCT\tTAT\tWT\n";
+    for(process &p : processes){
+        avgWT+= p.waiting;
+        avgTAT+= p.turnaround;
+        cout << p.id << "\t" << p.arrival << "\t" << p.burst << "\t" << p.completion << "\t"
+        << p.turnaround << "\t" << p.waiting << "\n";
+    }
+
+    cout << "AverageWT: " << avgWT/processes.size() << endl;
+    cout << "AverageTAT: " << avgTAT/processes.size() << endl;
+}
+
+int main(){
+    int n;
+    cout << "Number of processes: ";
+    cin >> n;
+
+    vector<process> processes;
+    processes.reserve(n);
+
+    int arr, burst;
+    for(int i = 0; i < n; i++){
+        cout << "Enter arrival and burst for process " << i << " : ";
+        cin >> arr >> burst;
+        processes.emplace_back(i,arr,burst);
+    }
+
+    srtf(processes);
+}
+
+4) RoundRobin
+#include<iostream>
+#include<vector>
+#include<queue>
+using namespace std;
+
+struct process{
+    int id;
+    int arrival;
+    int burst;
+    int completion;
+    int remaining;
+    int waiting;
+    int turnaround;
+    int response;
+    bool inreadyQ;
+    bool completed;
+
+    process(int _id, int _arrival, int _burst) : id(_id), arrival(_arrival), burst(_burst), remaining(_burst), 
+    waiting(0), turnaround(0), response(-1),inreadyQ(false), completed(false) {}
+};
+
+void round_robin(vector<process> &processes){
+    queue<process*> readyQ;
+    int currenttime = 0;
+    int time_quantum;
+    cout << "Enter time quantum: ";
+    cin >> time_quantum;
+    int completedproc = 0;
+    process* currentprocess = NULL;
+
+    for(int i = 0; i < processes.size(); i++){
+        if(!processes[i].completed && currenttime >= processes[i].arrival && !processes[i].inreadyQ){
+            readyQ.push(&processes[i]);
+            processes[i].inreadyQ = true;
+        }
+    }
+    
+    while(completedproc < processes.size()){
+        currentprocess = readyQ.front();
+        readyQ.pop();
+
+        if(currentprocess->response == -1)
+            currentprocess->response = currenttime - currentprocess->arrival;
+
+        currenttime += min(currentprocess->remaining, time_quantum);
+        currentprocess->remaining -= min(currentprocess->remaining, time_quantum);
+
+        for(int i = 0; i < processes.size(); i++){
+            if(!processes[i].completed && currenttime >= processes[i].arrival && !processes[i].inreadyQ){
+                readyQ.push(&processes[i]);
+                processes[i].inreadyQ = true;
+            }
+        }
+
+        if(currentprocess->remaining > 0)
+            readyQ.push(currentprocess);
+            
+        else{
+            completedproc++;
+            currentprocess->completion = currenttime;
+            currentprocess->turnaround = currenttime - currentprocess->arrival;
+            currentprocess->waiting = currentprocess->turnaround - currentprocess->burst;
+            currentprocess->completed = true;
+        }
+    }  
+
+    cout << "Id\tAT\tBT\tCT\tTAT\tWT\tRT\n";
+    for(process &p : processes){
+        cout << p.id << "\t" << p.arrival << "\t" << p.burst << "\t" << p.completion << "\t"
+        << p.turnaround << "\t" << p.waiting << "\t" << p.response << "\n";
+    }      
+}
+
+
+int main(){
+     int n;
+    cout << "Number of processes: ";
+    cin >> n;
+
+    vector<process> processes;
+    processes.reserve(n);
+
+    int arr, burst;
+    for(int i = 0; i < n; i++){
+        cout << "Enter arrival and burst for process " << i << " : ";
+        cin >> arr >> burst;
+        processes.emplace_back(i,arr,burst);
+    }
+
+    round_robin(processes);
+}
+
+5) priority non-pre
+
+#include<iostream>
+#include<vector>
+using namespace std;
+
+struct process{
+    int id;
+    int priority;
+    int arrival;
+    int burst;
+    int completion;
+    int waiting;
+    int turnaround;
+    int response;
+    bool completed;
+
+
+    process(int _id, int _priority, int _arrival, int _burst) : id(_id), priority(_priority), arrival(_arrival),
+    burst(_burst), waiting(0), turnaround(0), response(-1), completed(false) {}
+};
+
+void priority_np(vector<process> &processes){
+    int currenttime = 0;
+    int completed_processes = 0;
+    int max_priority;
+    process* currproc = NULL;
+
+    while(completed_processes < processes.size()){
+        max_priority = INT32_MAX;
+        for(int i = 0; i < processes.size(); i++){
+            if(!processes[i].completed && max_priority > processes[i].priority && processes[i].arrival <= currenttime){
+                max_priority = processes[i].priority;
+                currproc = &processes[i];
+            }
+        }
+
+        if(currproc == NULL){
+            currenttime++;
+        }
+        else{
+            if(currproc->response == -1)
+                currproc->response = currenttime;
+
+            currenttime += currproc->burst;
+            currproc->completion = currenttime;
+            currproc->turnaround = currenttime - currproc->arrival;
+            currproc->waiting = currproc->turnaround - currproc->burst;
+            currproc->completed = true;
+            completed_processes++;
+        }
+    }
+
+    cout << "Id\tAT\tBT\tCT\tTAT\tWT\tRT\n";
+    for(process &p : processes){
+        cout << p.id << "\t" << p.arrival << "\t" << p.burst << "\t" << p.completion << "\t"
+        << p.turnaround << "\t" << p.waiting << "\t" << p.response << "\n";
+    }      
+}
+
+
+int main(){
+    int n;
+    cout << "Number of processes: ";
+    cin >> n;
+
+    vector<process> processes;
+    processes.reserve(n);
+
+    int arr, burst, priority;
+    for(int i = 0; i < n; i++){
+        cout << "Enter arrival ,burst and priority for process " << i << " : ";
+        cin >> arr >> burst >>  priority;
+        processes.emplace_back(i,priority,arr,burst);
+    }
+
+    priority_np(processes);
+}
+
+6) priority prem
+
+#include<iostream>
+#include<vector>
+using namespace std;
+
+struct process {
+    int id;
+    int priority;
+    int arrival;
+    int burst;
+    int completion;
+    int waiting;
+    int turnaround;
+    int response;
+    int remaining;
+    bool completed;
+
+
+    process(int _id, int _priority, int _arrival, int _burst) : id(_id), priority(_priority), arrival(_arrival),
+        burst(_burst), waiting(0), turnaround(0), response(-1), remaining(_burst), completed(false) {}
+};
+
+void priority_p(vector<process>& processes) {
+    int currenttime = INT32_MAX;
+
+    for (int i = 0; i < processes.size(); i++) {
+        if (processes[i].arrival < currenttime)
+            currenttime = processes[i].arrival;
+    }
+
+    int completedprocesses = 0;
+    process* currentproc;
+    int maxpriority = INT32_MAX;
+
+    while (completedprocesses < processes.size()) {
+        currentproc = NULL;
+        maxpriority = INT32_MAX;
+
+        for (int i = 0; i < processes.size(); i++) {
+            if (!processes[i].completed && processes[i].arrival <= currenttime && maxpriority > processes[i].priority) {
+                maxpriority = processes[i].priority;
+                currentproc = &processes[i];
+            }
+        }
+
+        if (currentproc == NULL) {
+            currenttime++;
+        }
+        else {
+            if (currentproc->response == -1)
+                currentproc->response = currenttime - currentproc->arrival;
+
+            currenttime++; // Increment current time for each unit of time
+
+            if (currentproc->remaining > 0) {
+                currentproc->remaining--;
+
+                if (currentproc->remaining == 0) {
+                    currentproc->completion = currenttime;
+                    currentproc->turnaround = currenttime - currentproc->arrival;
+                    currentproc->waiting = currentproc->turnaround - currentproc->burst;
+                    currentproc->completed = true;
+                    completedprocesses++;
+                }
+            }
+        }
+    }
+
+    cout << "Id\tAT\tBT\tCT\tTAT\tWT\tRT\n";
+    for (process& p : processes) {
+        cout << p.id << "\t" << p.arrival << "\t" << p.burst << "\t" << p.completion << "\t"
+            << p.turnaround << "\t" << p.waiting << "\t" << p.response << "\n";
+    }
+}
+
+
+int main() {
+    int n;
+    cout << "Number of processes: ";
+    cin >> n;
+
+    vector<process> processes;
+    processes.reserve(n);
+
+    int arr, burst, priority;
+    for (int i = 0; i < n; i++) {
+        cout << "Enter priority, arrival, burst for process " << i << " : ";
+        cin >> priority >> arr >> burst;
+        processes.emplace_back(i, priority, arr, burst);
+    }
+
+    priority_p(processes);
+}
+
+Bankers Algo 
+
+#include<iostream>
+#include<vector>
+using namespace std;
+
+bool isSafe(vector<vector<int>> &max, vector<vector<int>> &alloc, vector<int> &avail, int res_types, int process){
+    vector<int> need(res_types);
+
+    for(int i = 0; i < res_types; i++){
+        need[i] = max[process][i] - alloc[process][i];
+    }
+    
+    for(int i = 0; i < res_types; i++){
+        if(need[i] > avail[i])
+            return false;
+    }
+    return true;
+}
+
+int main(){
+    int num_proc;
+    cout << "Enter number of processes: ";
+    cin >> num_proc;
+
+    int res_types;
+    cout << "Enter resource types: ";
+    cin >> res_types;
+
+    vector<vector<int>> alloc(num_proc,vector<int>(res_types,0));
+    vector<vector<int>> max(num_proc,vector<int>(res_types,0));
+    vector<int> avail(res_types);
+
+    for(int i = 0; i < num_proc; i++){
+        cout << "Enter resources allocated to process " << i << ": ";
+        for(int j = 0; j < res_types; j++){
+            cin >> alloc[i][j];
+        }
+    }
+
+    for(int i = 0; i < num_proc; i++){
+        cout << "Enter max resource usage of process " << i << ": ";
+        for(int j = 0; j < res_types; j++){
+            cin >> max[i][j];
+        }
+    }
+
+    cout << "Enter number of resources: ";
+    for(int i = 0; i < res_types; i++){
+        cin >> avail[i];
+    }
+
+    int completed_processes {0};
+    vector<int> safesequence;
+    vector<bool> completed(num_proc,false);
+
+    while(completed_processes < num_proc){
+        bool found = false;
+        for(int i = 0; i < num_proc; i++){
+            if(!completed[i] && isSafe(max,alloc,avail,res_types,i)){
+                
+                for(int j = 0; j < res_types; j++){
+                    avail[j] += alloc[i][j];
+                }
+
+                found = true;
+                completed_processes++;
+                completed[i] = true;
+                safesequence.push_back(i);
+            }
+        }
+        if(!found){
+            cout << "Deadlock detected...";
+            break;
+        }
+    }
+    if(completed_processes == num_proc){
+        cout << "Safe sequence: ";
+        for(int &proc : safesequence)
+            cout << proc << " ";
+    }
+}
