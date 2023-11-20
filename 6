@@ -1,0 +1,232 @@
+CPU scheduling 
+
+1) FCFS
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+int main()
+{
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    vector<int> p(n); // process id
+    vector<int> ArrivalTime(n);
+    vector<int> BurstTime(n);
+    vector<int> CompletionTime(n);
+    vector<int> WaitingTime(n);
+    vector<int> TurnaroundTime(n);
+
+    float avgWaitingTime = 0, avgTurnaroundTime = 0; // initializing to zero
+
+    for (int i = 0; i < n; i++)
+    {
+        cout << "Enter arrival time for process " << (i + 1) << ": "; // 'i+1' is process
+        cin >> ArrivalTime[i];
+        cout << "Enter burst time for process " << (i + 1) << ": ";
+        cin >> BurstTime[i];
+        p[i] = i + 1;
+    }
+    // Sorting using bubble sort algorithm
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n - (i + 1); j++)
+        {
+            if (ArrivalTime[j] > ArrivalTime[j + 1])
+            {
+                swap(ArrivalTime[j], ArrivalTime[j + 1]); // swapping arrival time
+                swap(BurstTime[j], BurstTime[j + 1]);     // arrival burst time
+                swap(p[j], p[j + 1]);                     // swap process ids
+            }
+        }
+    }
+    // Claculating CT,AT,BT,TAT,AWT,ATAT
+    for (int i = 0; i < n; i++)
+    {
+        if (i == 0)
+        {
+            CompletionTime[i] = ArrivalTime[i] + BurstTime[i];
+        }
+        else
+        {
+            if (ArrivalTime[i] > CompletionTime[i - 1])
+            {
+                CompletionTime[i] = ArrivalTime[i] + BurstTime[i];
+            }
+            else
+            {
+                CompletionTime[i] = CompletionTime[i - 1] + BurstTime[i];
+            }
+        }
+        TurnaroundTime[i] = CompletionTime[i] - ArrivalTime[i];
+        WaitingTime[i] = TurnaroundTime[i] - BurstTime[i];
+        avgWaitingTime += static_cast<float>(WaitingTime[i]);       // converting int waitingTime into float
+        avgTurnaroundTime += static_cast<float>(TurnaroundTime[i]); //
+    }
+
+    cout << "\npid  arrivalT  burstT  completeT turnT waitingT" << endl;
+    for (int i = 0; i < n; i++)
+    {
+        cout << p[i] << "  \t " << ArrivalTime[i] << "\t" << BurstTime[i] << "\t" << CompletionTime[i] << "\t"
+             << TurnaroundTime[i] << "\t" << WaitingTime[i] << endl;
+    }
+
+    cout << "\naverage waiting time: " << (avgWaitingTime / n) << endl;
+    cout << "average turnaround time: " << (avgTurnaroundTime / n) << endl;
+
+    return 0;
+}
+
+2) SJF
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    cout << "Enter no of process: ";
+    int totalProcesses;
+    cin >> totalProcesses;
+
+    vector<int> pid(totalProcesses);
+    vector<int> arrivalTime(totalProcesses);
+    vector<int> burstTime(totalProcesses);
+    vector<int> completionTime(totalProcesses);
+    vector<int> turnaroundTime(totalProcesses);
+    vector<int> waitingTime(totalProcesses);
+    vector<int> flag(totalProcesses, 0);
+    int executedTime = 0;
+    int executedProcesses = 0;
+    float averageWaitingTime = 0;
+    float averageTurnaroundTime = 0;
+
+    for (int i = 0; i < totalProcesses; i++) {
+        cout << "Enter process " << (i + 1) << " arrival time: ";
+        cin >> arrivalTime[i];
+        cout << "Enter process " << (i + 1) << " burst time: ";
+        cin >> burstTime[i];
+        pid[i] = i + 1;
+    }
+
+    while (true) {
+        int c = totalProcesses;
+        int min = 999;
+
+        if (executedProcesses == totalProcesses)
+            break;
+
+        for (int i = 0; i < totalProcesses; i++) {
+            if ((arrivalTime[i] <= executedTime) && (flag[i] == 0) && (burstTime[i] < min)) {
+                min = burstTime[i];
+                c = i;
+            }
+        }
+
+        if (c == totalProcesses)
+            executedTime++;
+        else {
+            completionTime[c] = executedTime + burstTime[c];
+            executedTime += burstTime[c];
+            turnaroundTime[c] = completionTime[c] - arrivalTime[c];
+            waitingTime[c] = turnaroundTime[c] - burstTime[c];
+            flag[c] = 1;
+            executedProcesses++;
+        }
+    }
+
+    cout << "\npid  arrival burst  complete turn waiting" << endl;
+    for (int i = 0; i < totalProcesses; i++) {
+        averageWaitingTime += waitingTime[i];
+        averageTurnaroundTime += turnaroundTime[i];
+        cout << pid[i] << "\t" << arrivalTime[i] << "\t" << burstTime[i] << "\t" << completionTime[i] << "\t" << turnaroundTime[i] << "\t" << waitingTime[i] << endl;
+    }
+
+    cout << "\nAverage Turnaround Time is " << (averageTurnaroundTime / totalProcesses) << endl;
+    cout << "Average Waiting Time is " << (averageWaitingTime / totalProcesses) << endl;
+
+    return 0;
+}
+
+3) SRTF
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    cout << "Enter no of process: ";
+    int totalProcesses;
+    cin >> totalProcesses;
+
+    vector<int> pid(totalProcesses);
+    vector<int> arrivalTime(totalProcesses);
+    vector<int> burstTime(totalProcesses);
+    vector<int> completionTime(totalProcesses, 0);
+    vector<int> turnaroundTime(totalProcesses);
+    vector<int> waitingTime(totalProcesses);
+    vector<int> flag(totalProcesses, 0);
+    vector<int> TempBurst(totalProcesses);
+    int executedTime = 0;
+    int executedProcesses = 0;
+    float averageWaitingTime = 0;
+    float averageTurnaroundTime = 0;
+
+    for (int i = 0; i < totalProcesses; i++) {
+        pid[i] = i + 1;
+        cout << "Enter process " << (i + 1) << " arrival time: ";
+        cin >> arrivalTime[i];
+        cout << "Enter process " << (i + 1) << " burst time: ";
+        cin >> burstTime[i];
+        TempBurst[i] = burstTime[i];
+        flag[i] = 0;
+    }
+
+    while (true) {
+        int min = 99, c = totalProcesses;
+        if (executedProcesses == totalProcesses)
+            break;
+
+        for (int i = 0; i < totalProcesses; i++) {
+            if ((arrivalTime[i] <= executedTime) && (flag[i] == 0) && (burstTime[i] < min)) {
+                min = burstTime[i];
+                c = i;
+            }
+        }
+
+        if (c == totalProcesses)
+            executedTime++;
+        else {
+            burstTime[c]--;
+            executedTime++;
+            if (burstTime[c] == 0) {
+                completionTime[c] = executedTime;
+                flag[c] = 1;
+                executedProcesses++;
+            }
+        }
+    }
+
+    for (int i = 0; i < totalProcesses; i++) {
+        turnaroundTime[i] = completionTime[i] - arrivalTime[i];
+        waitingTime[i] = turnaroundTime[i] - TempBurst[i];
+        averageWaitingTime += waitingTime[i];
+        averageTurnaroundTime += turnaroundTime[i];
+    }
+
+    cout << "pid  arrival  burst  complete turn waiting" << endl;
+    for (int i = 0; i < totalProcesses; i++) {
+        cout << pid[i] << "\t" << arrivalTime[i] << "\t" << TempBurst[i] << "\t" << completionTime[i] << "\t" << turnaroundTime[i] << "\t" << waitingTime[i] << endl;
+    }
+
+    cout << "\nAverage Turnaround Time is " << (averageTurnaroundTime / totalProcesses) << endl;
+    cout << "Average Waiting Time is " << (averageWaitingTime / totalProcesses) << endl;
+
+    return 0;
+}
+
+
+
+
+
