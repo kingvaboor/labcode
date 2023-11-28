@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <limits.h>
+int hash(int key, int size) {
+    return (key % size);
+}
+bool isCollision(int currentElement) {
+    return (currentElement != INT_MAX);
+}
+int linearProbing(int *hashTable, int hashSize, int key, int i) {
+    key = (hash(key, hashSize) + i) % hashSize;
+    if (isCollision(hashTable[key])) {
+        return linearProbing(hashTable, hashSize, key, i + 1);
+    } else {
+        return key;
+    }
+}
+int quadraticProbing(int *hashTable, int hashSize, int key, int i) {
+    key = (hash(key, hashSize) + i * i) % hashSize;
+    if (isCollision(hashTable[key])) {
+        return quadraticProbing(hashTable, hashSize, key, i + 1);
+    } else {
+        return key;
+    }
+}
+int doubleHashing(int *hashTable, int hashSize, int key, int i) {
+    key = (hash(key, hashSize) + i * hash(key, hashSize)) % hashSize;
+    if (isCollision(hashTable[key])) {
+        return doubleHashing(hashTable, hashSize, key, i + 1);
+    } else {
+        return key;
+    }
+}
+int main() {
+    int hashSize, key, value, choice;
+    printf("Enter the number of inputs \n");
+    scanf("%d", &hashSize);
+    int *hashTable = (int *)malloc(hashSize * sizeof(int));
+    for (int i = 0; i < hashSize; i++) {
+        hashTable[i] = INT_MAX;
+    }
+    for (int i = 0; i < hashSize; i++) {
+        printf("Enter your key\n");
+        scanf("%d", &value);
+        key = hash(value, hashSize);
+        if (!isCollision(hashTable[key])) {
+            hashTable[key] = value;
+        } else {
+            printf("Collision Occurred\n");
+            printf("Which collision handling technique do you want to use\n 1.Linear Probing\n 2.Quadratic Probing\n 3.Double Hashing\n");
+            scanf("%d", &choice);
+                   switch (choice) {
+                case 1:
+                    key = linearProbing(hashTable, hashSize, key, 1);
+                    hashTable[key] = value;
+                    break;
+                case 2:
+                    key = quadraticProbing(hashTable, hashSize, key, 1);
+                    hashTable[key] = value;
+                    break;
+                case 3:
+                    key = doubleHashing(hashTable, hashSize, key, 1);
+                    hashTable[key] = value;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    for (int i = 0; i < hashSize; i++) {
+        printf("Key: %d, Value: %d\n", i + 1, hashTable[i]);
+    }
+    free(hashTable); // Don't forget to free the allocated memory
+    return 0;
+}
