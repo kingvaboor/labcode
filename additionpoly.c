@@ -1,41 +1,52 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+// Structure representing a term in a polynomial
 struct poly
 {
     int coeff;
     int expon;
     struct poly *next;
 };
+
 typedef struct poly poly;
+
+// Function prototypes
 poly *create(int coefficient, int exponent);
 void insertterm(poly **poly, int coefficient, int exponent);
 poly *addpolynomials(poly *poly1, poly *poly2);
 void displayPolynomial(poly *poly);
+
+// Function to create a new term in the polynomial
 poly *create(int coefficient, int exponent)
 {
-    poly *poly = (struct poly *)malloc(sizeof(struct poly));
-    poly->coeff = coefficient;
-    poly->expon = exponent;
-    poly->next = NULL;
-    return poly;
+    poly *term = (struct poly *)malloc(sizeof(struct poly));
+    term->coeff = coefficient;
+    term->expon = exponent;
+    term->next = NULL;
+    return term;
 }
-void insertterm(poly **poly1, int coefficient, int exponent)
+
+// Function to insert a term into the polynomial
+void insertterm(poly **poly, int coefficient, int exponent)
 {
-    poly *newpoly = create(coefficient, exponent);
-    if (*poly1 == NULL)
+    poly *newterm = create(coefficient, exponent);
+    if (*poly == NULL)
     {
-        *poly1 = newpoly;
+        *poly = newterm;
     }
     else
     {
-        poly *current = *poly1;
+        poly *current = *poly;
         while (current->next != NULL)
         {
             current = current->next;
         }
-        current->next = newpoly;
+        current->next = newterm;
     }
 }
+
+// Function to add two polynomials
 poly *addpolynomials(poly *poly1, poly *poly2)
 {
     poly *result = NULL;
@@ -74,6 +85,8 @@ poly *addpolynomials(poly *poly1, poly *poly2)
     }
     return result;
 }
+
+// Function to display a polynomial
 void displayPolynomial(poly *poly)
 {
     if (poly == NULL)
@@ -92,11 +105,14 @@ void displayPolynomial(poly *poly)
     }
     printf("\n");
 }
+
 int main()
 {
     poly *poly1 = NULL;
     poly *poly2 = NULL;
     int n1, n2, coeff, exp;
+
+    // Input for polynomial 1
     printf("Enter the number of terms for polynomial 1 :");
     scanf("%d", &n1);
     printf("Enter the terms for polynomial 1 (coefficient exponent):\n");
@@ -105,6 +121,8 @@ int main()
         scanf("%d %d", &coeff, &exp);
         insertterm(&poly1, coeff, exp);
     }
+
+    // Input for polynomial 2
     printf("Enter the number of terms for polynomial 2 :");
     scanf("%d", &n2);
     printf("Enter the terms for polynomial 2 (coefficient exponent):\n");
@@ -113,17 +131,22 @@ int main()
         scanf("%d %d", &coeff, &exp);
         insertterm(&poly2, coeff, exp);
     }
+
+    // Display the input polynomials
     printf("\nPolynomial 1 :");
     displayPolynomial(poly1);
     printf("\nPolynomial 2 :");
     displayPolynomial(poly2);
 
+    // Add the polynomials and display the result
     poly *result = addpolynomials(poly1, poly2);
     printf("\nResultant polynomial :");
     displayPolynomial(result);
 
+    // Free allocated memory
     free(poly1);
     free(poly2);
     free(result);
-    return 0;
+
+    return 0;
 }
