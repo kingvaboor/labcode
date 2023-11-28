@@ -12,16 +12,22 @@
 // Delete
 // Exit Program
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+// Structure representing a node in the threaded binary search tree
 struct node
 {
     int val;
-    bool lbit;
-    bool rbit;
+    bool lbit; // left thread indicator
+    bool rbit; // right thread indicator
 
-    struct node *left;
-    struct node *right;
+    struct node *left;  // left child pointer
+    struct node *right; // right child pointer
 };
 
+// Function prototypes
 struct node *getNode(int val);
 struct node *insert(struct node *head, int key);
 
@@ -36,55 +42,37 @@ struct node *findParent(struct node *p);
 struct node *postSuccessor(struct node *p);
 void postorder(struct node *head);
 
-// ********************************* DELETE ********************************
+// Delete function prototypes
 struct node *delThreadedBST(struct node *head, int key);
 struct node *delTwoChild(struct node *head, struct node *par, struct node *ptr);
 struct node *delOneChild(struct node *head, struct node *par, struct node *ptr);
 struct node *delNoChild(struct node *head, struct node *par, struct node *ptr);
 
+// Main function
 int main()
 {
+    // Initialization of the threaded binary search tree
     struct node *head;
     head = (struct node *)malloc(sizeof(struct node));
     head->lbit = 0;
-    head->rbit = 1;     // convention for all cases
-    head->right = head; // convention for all cases
-    head->left = head;  // head->left should point to root
+    head->rbit = 1;
+    head->right = head;
+    head->left = head;
 
-    // uncomment the following to create a sample tree like
+    // Uncomment the following to create a sample tree
+    // insert(head, 10);
+    // insert(head, 5);
+    // ...
 
-    // insert(head,10);
-    // insert(head,5);
-    // insert(head,15);
-    // insert(head,20);
-    // insert(head,13);
-    // insert(head,14);
-    // insert(head,12);
-    // insert(head,8);
-    // insert(head,3);
-    // insert(head, 21);
-    // insert(head, 22);
-    // insert(head, 30);
-
-    // will create a tree like this
-    //              10
-    //     5                    15
-    //   3   8            13           20
-    //                12     14           21
-    //                                      22
-    //                                        30
-    // or use menu driven approach
-
+    // Menu-driven approach for tree operations
     while (1)
     {
         printf("\n\n\n\n****************************************************************");
         printf("\nSelect operation");
-
         printf("\n\t1.Insert\n\t2.Traverse(pre in)\n\t3.Delete\n\n\t0.Exit\n\nEnter your choice: ");
         int n;
         scanf("%d", &n);
         int temp;
-        // system("cls");
 
         switch (n)
         {
@@ -104,7 +92,7 @@ int main()
         {
             printf("\nEnter number to Delete: ");
             scanf("%d", &temp);
-            delThreadedBST(head, temp);
+            head = delThreadedBST(head, temp);
         }
         break;
 
@@ -113,7 +101,7 @@ int main()
             break;
 
         default:
-            printf("invalid Choixe.");
+            printf("Invalid Choice.");
             break;
         }
     }
@@ -121,13 +109,7 @@ int main()
     return 0;
 }
 
-//             10
-//    5                    15
-//  3   8            13           20
-//               12     14           21
-//                                      22
-//                                        30
-
+// Functions for creating a new node and inserting into the threaded binary search tree
 struct node *getNode(int val)
 {
     struct node *temp = (struct node *)malloc(sizeof(struct node));
@@ -141,6 +123,7 @@ struct node *getNode(int val)
 
 struct node *insert(struct node *head, int key)
 {
+    // Function to insert a key into the threaded binary search tree
     struct node *temp = getNode(key);
     struct node *p;
 
@@ -158,7 +141,6 @@ struct node *insert(struct node *head, int key)
     {
         if (key < p->val && p->lbit == 1)
             p = p->left;
-
         else if (key > p->val && p->rbit == 1)
             p = p->right;
         else
@@ -172,12 +154,10 @@ struct node *insert(struct node *head, int key)
         temp->right = p;
         p->left = temp;
     }
-
     else if (key > p->val)
     {
         p->rbit = 1;
-        // rearrange the thread after linking new node
-        temp->right = p->right; // inorder successor (next)
+        temp->right = p->right;
         temp->left = p;
         p->right = temp;
     }
@@ -185,8 +165,10 @@ struct node *insert(struct node *head, int key)
     return head;
 }
 
+// Functions for finding the inorder predecessor and successor
 struct node *inorderPredecessor(struct node *p)
 {
+    // Function to find the inorder predecessor of a node
     if (p->lbit == 0)
         return p->left;
     else if (p->lbit == 1)
@@ -200,6 +182,7 @@ struct node *inorderPredecessor(struct node *p)
 
 struct node *inorderSuccessor(struct node *p)
 {
+    // Function to find the inorder successor of a node
     if (p->rbit == 0)
         return p->right;
     else if (p->rbit == 1)
@@ -211,8 +194,10 @@ struct node *inorderSuccessor(struct node *p)
     return p;
 }
 
+// Functions for tree traversal (inorder, preorder, postorder)
 void inorder(struct node *head)
 {
+    // Function to perform inorder traversal
     struct node *p;
     p = head->left;
     while (p->lbit == 1)
@@ -227,6 +212,7 @@ void inorder(struct node *head)
 
 void preorder(struct node *head)
 {
+    // Function to perform preorder traversal
     struct node *p;
     p = head->left;
 
@@ -253,8 +239,8 @@ void preorder(struct node *head)
 
 struct node *findParent(struct node *p)
 {
+    // Function to find the parent of a node
     struct node *child = p;
-    // ancestor of child
     while (p->rbit == 1)
         p = p->right;
     p = p->right;
@@ -272,13 +258,12 @@ struct node *findParent(struct node *p)
 
 struct node *postSuccessor(struct node *p)
 {
+    // Function to find the postorder successor of a node
     struct node *cur = p;
     struct node *parent = findParent(cur);
-    // printf("suc %d\n", parent->val);
 
     if (parent->right == cur)
         return parent;
-
     else
     {
         while (p->rbit == 1)
@@ -296,13 +281,13 @@ struct node *postSuccessor(struct node *p)
                     p = p->right;
             }
         }
-        // printf("suc %d\n", p->val);
     }
     return p;
 }
 
 void postorder(struct node *head)
 {
+    // Function to perform postorder traversal
     struct node *p = head->left;
     struct node *temp = p;
     while (!(p->rbit == 0 && p->lbit == 0))
@@ -318,7 +303,6 @@ void postorder(struct node *head)
 
     while (p != head->left)
     {
-        // printf(" hello\n");
         p = postSuccessor(p);
         printf(" %d", p->val);
     }
@@ -326,10 +310,10 @@ void postorder(struct node *head)
 
 void Traversal(struct node *head)
 {
+    // Function to select traversal type (preorder, inorder, postorder)
     printf("\nTraversal Type : \n1.preorder\n2.Inorder\n3.PostOrder\n\n\nEnter your choice: ");
     int n;
     scanf("%d", &n);
-    // system("cls");
     switch (n)
     {
     case 1:
@@ -352,13 +336,11 @@ void Traversal(struct node *head)
     }
 }
 
-// ********************************* DELETE ********************************
-
+// Functions for deleting a node from the threaded binary search tree
 struct node *delThreadedBST(struct node *head, int key)
 {
-
+    // Function to delete a node from the threaded binary search tree
     struct node *par = head, *ptr = head->left;
-
     bool found = 0;
 
     while (ptr != head)
@@ -402,7 +384,7 @@ struct node *delThreadedBST(struct node *head, int key)
 
 struct node *delTwoChild(struct node *head, struct node *par, struct node *ptr)
 {
-
+    // Function to delete a node with two children
     struct node *parSuc = ptr;
     struct node *suc = ptr->right;
 
@@ -425,7 +407,7 @@ struct node *delTwoChild(struct node *head, struct node *par, struct node *ptr)
 
 struct node *delOneChild(struct node *head, struct node *par, struct node *ptr)
 {
-
+    // Function to delete a node with one child
     struct node *child;
     if (ptr->lbit == 1)
         child = ptr->left;
@@ -436,13 +418,9 @@ struct node *delOneChild(struct node *head, struct node *par, struct node *ptr)
     struct node *s = inorderSuccessor(ptr);
 
     if (ptr == par->left)
-    {
         par->left = child;
-    }
     else
-    {
         par->right = child;
-    }
 
     if (ptr->lbit == 1)
         p->right = s;
@@ -453,8 +431,10 @@ struct node *delOneChild(struct node *head, struct node *par, struct node *ptr)
     free(ptr);
     return head;
 }
+
 struct node *delNoChild(struct node *head, struct node *par, struct node *ptr)
 {
+    // Function to delete a node with no children
     if (ptr == head->left)
     {
         ptr = NULL;
@@ -470,5 +450,6 @@ struct node *delNoChild(struct node *head, struct node *par, struct node *ptr)
         par->right = ptr->right;
     }
     free(ptr);
-    return head;
+    return head;
 }
+
