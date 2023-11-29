@@ -1,1 +1,194 @@
+#include<stdio.h>
+#include<stdlib.h>
 
+typedef struct node{
+    int data;
+    struct node* left, *right;
+}*pnode,node;
+
+pnode createnode(int data){
+
+    pnode newnode = (pnode)malloc(sizeof(node));
+    newnode->data = data;
+    newnode->left = newnode->right = NULL;
+    return newnode;
+}
+
+pnode insert(pnode root, int data){
+    if(!root)
+        return createnode(data);
+    else if(data < root->data)
+        root->left = insert(root->left,data);
+    else if(data > root->data)
+        root->right = insert(root->right,data);
+    else
+        printf("Node exists\n");
+    return root;
+}
+
+void preorder(pnode root){
+    pnode stack[20];
+    int top = -1;
+    stack[++top] = root;
+
+    while(top > -1){
+        pnode temp = stack[top--];
+        printf("%d ",temp->data);
+
+        if(temp->right)
+            stack[++top] = temp->right;
+        if(temp->left)
+            stack[++top] = temp->left;
+    }
+    printf("\n");
+}
+
+void inorder(pnode root){
+    pnode stack[20];
+    int top = -1;
+    pnode curr = root;
+
+
+    while(curr || top > -1){
+        while(curr){
+            stack[++top] = curr;
+            curr = curr->left;
+        }
+        curr = stack[top--];
+        printf("%d ",curr->data);
+        curr = curr->right;
+    }
+}
+
+void postorder(pnode root){
+    pnode stack[20];
+    int top = -1;
+    pnode curr = root;
+    pnode prev = NULL;
+    printf("\n");
+
+    do{
+        while(curr){
+            stack[++top] = curr;
+            curr = curr->left;
+        }
+
+        while(top > -1){
+            if(stack[top]->right == NULL || stack[top]->right == prev){
+                curr = stack[top--];
+                printf("%d ",curr->data);
+                prev = curr;
+            }
+            else {
+                curr = stack[top]->right;
+                break;
+            }
+        }
+
+    }while(top > -1);
+}
+
+void levelorder(pnode root){
+    pnode queue[20];
+    int f = -1;
+    int r = 0;
+    queue[r] = root;
+    printf("\n");
+
+    while(f != r){
+        pnode temp = queue[++f];
+        printf("%d ",temp->data);
+
+        if(temp->left)
+            queue[++r] = temp->left;
+        if(temp->right)
+            queue[++r] = temp->right;
+    }
+}
+
+void height(pnode root){
+    pnode queue[20];
+    int f = -1;
+    int r = 0;
+    int height = 0;
+
+    queue[r] = root;
+    printf("\n");
+
+    while(f != r){
+        int nodesinlevel = r - f;
+        while(nodesinlevel--){
+            pnode temp = queue[++f];
+
+            if(temp->left)
+                queue[++r] = temp->left;
+            if(temp->right)
+                queue[++r] = temp->right;
+        }
+        height++;
+    }
+    printf("%d",height);
+}
+
+void leafnodes(pnode root){
+    pnode queue[20];
+    int f = -1;
+    int r = 0;
+    int height = 0;
+
+    queue[r] = root;
+    printf("\n");
+
+    while(f != r){
+        pnode temp = queue[++f];
+        if(!temp->left && !temp->right)
+            printf("%d ",temp->data);
+
+        if(temp->left)
+            queue[++r] = temp->left;
+        if(temp->right)
+            queue[++r] = temp->right;
+    }
+}
+
+void mirrorimage(pnode root){
+    pnode queue[20];
+    int f = -1;
+    int r = 0;
+    int height = 0;
+
+    queue[r] = root;
+    printf("\n");
+
+    while(f != r){
+        pnode temp = queue[++f];
+        printf("%d ",temp->data);
+
+        if(temp->right)
+            queue[++r] = temp->right;
+        if(temp->left)
+            queue[++r] = temp->left;
+    }
+}
+
+
+int main(){
+
+    pnode root = NULL;
+
+    root = insert(root,10);
+    root = insert(root,12);
+    root = insert(root,14);
+    root = insert(root,16);
+    root = insert(root,6);
+    root = insert(root,5);
+    root = insert(root,8);
+    preorder(root);
+    inorder(root);
+    postorder(root);
+    levelorder(root);
+    height(root);
+    leafnodes(root);
+    mirrorimage(root);
+
+}
