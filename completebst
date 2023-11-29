@@ -1,0 +1,368 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+//1. Create \n2. Insert \n3. Delete \n4. Mirror Image \n5. Level Wise Display \n6. Height of the tree \n7. Display Leaf Nodes \n8. Inorder \n9. Preorder\n10. Postorder 
+
+struct node
+{
+    int data;
+    struct node *left, *right;
+};
+
+struct node *root = NULL;
+
+struct stack
+{
+    struct node* data;
+    struct stack *next;
+};
+
+struct stack *top =NULL;
+
+void push(struct node *T)
+{
+    struct stack *newstack;
+    newstack = (struct stack*)malloc(sizeof(struct stack));
+    newstack->data=T;
+    newstack ->next=NULL;
+    newstack->next=top;
+    top = newstack;
+}
+
+struct node * pop()
+{
+    struct stack *temp;
+    temp = top;
+    struct node * val = temp->data;
+    top = top->next;
+    free(temp);
+    temp = NULL;
+    return val;
+}
+
+int emptystack()
+{
+    if (top == NULL)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+struct node * Top()
+{
+    struct stack *temp;
+    temp = top;
+    struct node *TOP = temp->data;
+    return TOP;
+}
+
+struct node* create (struct node *root, int key)
+{
+    struct node *temp, *p, *q;
+    temp = (struct node*)malloc(sizeof(struct node));
+    temp -> data = key;
+    temp ->left = temp->right = NULL;
+    if (root == NULL)
+    {
+        root = temp;
+        return root;
+    }
+    p = root;
+    while (p!=NULL)
+    {
+        q = p;
+        if (key < p->data)
+        {
+            p = p->left;
+        }
+        else
+        {
+            p = p -> right;
+        }
+
+    }
+    if (q->data < key)
+    {
+        q ->right = temp;
+    }
+    else
+    {
+        q->left=temp;
+    }
+    return root;
+}
+
+void preorder(struct node*root)
+{
+    printf("\nPreorder: ");
+    struct node * T = root;
+    while (T!=NULL)
+    {
+        printf("%d ",T->data);
+        push(T);
+        T=T->left;
+    }
+    while (emptystack()==1)
+    {
+        T=pop();
+        T=T->right;
+        while (T!=NULL)
+        {
+            printf("%d ",T->data);
+            push(T);
+            T=T->left;
+        }
+    }
+    printf("\n");
+}
+
+void postorder(struct node *root)
+{
+    printf("Postorder: ");
+    struct node*prev;
+    struct node* del;
+    struct node* T = root;
+    do
+    {
+        while (T!=NULL)
+        {
+            push(T);
+            T=T->left;
+        }
+        while (T == NULL &&  emptystack()==1)
+        {
+            T=Top();
+            if (T->right == NULL || T->right == prev)
+            {
+                printf("%d ", T->data);
+                prev=T;
+                del = pop();
+                free(del);
+                T = NULL;
+            }
+            else
+            {
+                T=T->right;
+            }
+        }
+    } while (emptystack()==1);
+
+}
+
+void inorder(struct node*root)
+{
+    printf("Inorder: ");
+    struct node* T = root;
+    while (T!=NULL)
+    {
+        push(T);
+        T=T->left;
+    }
+    while (emptystack()==1)
+    {
+        T=pop();
+        printf("%d ",T->data);
+        T=T->right;
+        while (T!=NULL)
+        {
+            push(T);
+            T=T->left;
+        }
+    }
+    printf("\n");
+}
+
+struct node* find_max(struct node* T)
+{
+    while (T->right != NULL)
+    {
+        T = T->right;
+    }
+    return T;
+}
+
+struct node *delete(struct node *root, int data)
+{
+    if (root == NULL)
+        return root;
+    if (root->data > data)
+    {
+        root->left = delete (root->left, data);
+        return root;
+    }
+    else if (root->data < data)
+    {
+        root->right = delete (root->right, data);
+        return root;
+    }
+    if (root->left == NULL)
+    {
+        struct node *temp = root->right;
+        free(root);
+        return temp;
+    }
+    else if (root->right == NULL)
+    {
+        struct node *temp = root->left;
+        free(root);
+        return temp;
+    }
+    else
+    {
+
+        struct node *p = root;
+        struct node *q = root->right;
+        while (q->left != NULL)
+        {
+            p = q;
+            q = q->left;
+        }
+        if (p != root)
+            {p->left = q->right;}
+        else
+            {p->right = q->right;
+        root->data = q->data;
+        free(q);}
+        return root;
+}
+}
+
+int height(struct node *root)
+{
+    if (root == NULL)
+    {
+        return 0;
+    }
+    else
+    {
+        int leftH = height(root->left);
+        int rightH = height(root->right);
+        if (leftH>rightH)
+        {
+            return leftH+1;
+        }
+        else
+        {
+            return rightH+1;
+        }
+    }
+
+}
+
+void printGivenLevel(struct node* root, int level)
+{
+    if (root == NULL)
+        return;
+    if (level == 1)
+        printf("%d ", root->data);
+    else if (level > 1) {
+        printGivenLevel(root->left, level - 1);
+        printGivenLevel(root->right, level - 1);
+    }
+}
+
+void printLevelOrder(struct node* root)
+{
+    int h = height(root);
+    int i;
+    for (i = 1; i <= h; i++) {
+        printGivenLevel(root, i);
+        printf("\n");
+    }
+}
+
+struct node *mirror(struct node *M){
+    if(M==NULL)
+    {
+        return NULL;
+    }
+    else
+    {
+        mirror(M->left);
+        mirror(M->right);
+        struct node *temp;
+        temp = M->left;
+        M->left = M->right;
+        M->right = temp;
+    }
+}
+
+void printLeaf(struct node* root)
+ {
+    if (!root)
+    {
+        return;
+    }
+    if (!root->left && !root->right)
+    {
+        printf("%d ", root->data);
+        return ;
+    }
+    if (root->left)
+       printLeaf(root->left);
+
+    if (root->right)
+       printLeaf(root->right);
+}
+
+void main()
+{
+    int choice, data;
+    do
+    {
+        printf("\n      BINARY TREE OPERATIONS      ");
+        printf("\n1. Create \n2. Insert \n3. Delete \n4. Mirror Image \n5. Level Wise Display \n6. Height of the tree \n7. Display Leaf Nodes \n8. Inorder \n9. Preorder\n10. Postorder \n11. Exit");
+        printf("\nEnter your choice: ");
+        scanf("%d",&choice);
+        switch(choice)
+        {
+            case 1:
+            printf("Enter Data you want to Enter: ");
+            scanf("%d",&data);
+            root = create(root, data);
+            break;
+            case 2:
+            printf("Enter Data you want to Enter: ");
+            scanf("%d",&data);
+            root = create(root, data);
+            break;
+            case 3:
+            printf("Enter key you want to delete: ");
+            scanf("%d",&data);
+            root = delete(root,data);
+            break;
+            case 4:
+            mirror(root);
+            break;
+            case 5:
+            printLevelOrder(root);
+            break;
+            case 6:
+            printf("\nThe height of the tree is %d",height(root));
+            break;
+            case 7:
+            printf("\nThe leaf nodes are: ");
+            printLeaf(root);
+            break;
+            case 8:
+            inorder(root);
+            break;
+            case 9:
+            preorder(root);
+            break;
+            case 10:
+            postorder(root);
+            break;
+            case 11:
+            break;            
+            default:
+            printf("\nInvalid Choice");
+            break;
+        }
+    }while(choice != 11);
+}
