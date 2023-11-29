@@ -1,0 +1,228 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<limits.h>
+
+typedef struct matrix {
+    int vertices;
+    int **adjmat;
+} *pmatrix, matrix;
+
+pmatrix creatematrix(int vertices) {
+    pmatrix newmat = (pmatrix)malloc(sizeof(matrix));
+    newmat->vertices = vertices;
+    newmat->adjmat = (int**)malloc(sizeof(int*) * vertices);
+
+    for (int i = 0; i < vertices; i++) {
+        newmat->adjmat[i] = (int*)calloc(vertices, sizeof(int));
+    }
+    return newmat;
+}
+
+void addedge(pmatrix mat, int src, int dest, int w) {
+    mat->adjmat[dest][src] = w;
+    mat->adjmat[src][dest] = w;
+}
+
+void BFS(pmatrix mat, int src) {
+    int* visited = (int*)calloc(mat->vertices, sizeof(int));
+    int queue[20];
+    int f = -1;
+    int r = -1;
+    queue[++r] = src;
+
+    while (f != r) {
+        int vert = queue[++f];
+        printf("%d ", vert);
+        visited[vert] = 1;
+
+        for (int j = 0; j < mat->vertices; j++) {
+            if (!visited[j] && mat->adjmat[vert][j]) {
+                queue[++r] = j;
+                visited[j] = 1;
+            }
+        }
+    }
+}
+
+void DFS(pmatrix mat, int src) {
+    int* visited = (int*)calloc(mat->vertices, sizeof(int));
+    int stack[20];
+    int top = -1;
+    stack[++top] = src;
+
+    while (top > -1) {
+        int vert = stack[top--];
+        printf("%d ", vert);
+        visited[vert] = 1;
+
+        for (int j = 0; j < mat->vertices; j++) {
+            if (!visited[j] && mat->adjmat[vert][j]) {
+                stack[++top] = j;
+                visited[j] = 1;
+            }
+        }
+    }
+}
+
+void Prims(pmatrix mat) {
+    int* key = (int*)malloc(sizeof(int) * mat->vertices);
+    int* mst = (int*)calloc(mat->vertices, sizeof(int));
+    int* parent = (int*)malloc(sizeof(int) * mat->vertices);
+
+    //init
+    for (int i = 0; i < mat->vertices; i++) {
+        key[i] = INT_MAX;
+        parent[i] = -1;
+    }
+    key[0] = 0;
+    parent[0] = 0;
+
+    for (int i = 1; i < mat->vertices; i++) {
+        int u;
+        int mini = INT_MAX;
+
+        // finding nearest node
+        for (int i = 0; i < mat->vertices; i++) {
+            if (!mst[i] && key[i] < mini) {
+                mini = key[i];
+                u = i;
+            }
+        }
+
+        mst[u] = 1;
+
+        //check adjacent nodes
+        for (int i = 0; i < mat->vertices; i++) {
+            if (!mst[i] && mat->adjmat[u][i] && mat->adjmat[u][i] < key[i]) {
+                key[i] = mat->adjmat[u][i];
+                parent[i] = u;
+            }
+        }
+    }
+
+    for (int i = 1; i < mat->vertices; i++) {
+        printf("%d - %d , dist: %d\n", i, parent[i], key[i]);
+    }
+}
+
+void dijkstras(pmatrix mat) {
+    int* dist = (int*)malloc(sizeof(int) * mat->vertices);
+    int* sptset = (int*)calloc(mat->vertices, sizeof(int));
+    printf("\n\n");
+
+    //init
+    for (int i = 0; i < mat->vertices; i++) {
+        dist[i] = INT_MAX;
+        sptset[i] = 0;
+    }
+    dist[0] = 0;
+
+    for (int i = 0; i < mat->vertices - 1; i++) {
+        int u;
+        int mini = INT_MAX;
+
+        // finding nearest node
+        for (int v = 0; v < mat->vertices; v++) {
+            if (!sptset[v] && dist[v] < mini) {
+                mini = dist[v];
+                u = v;
+            }
+        }
+
+        sptset[u] = 1;
+
+        //check adjacent nodes
+        for (int v = 0; v < mat->vertices; v++) {
+            if (!sptset[v] && mat->adjmat[u][v] && (mat->adjmat[u][v] + dist[u] < dist[v])) {
+                dist[v] = dist[u] + mat->adjmat[u][v];
+            }
+        }
+    }
+
+    for (int i = 0; i < mat->vertices; i++) {
+        printf("%d - %d\n", i, dist[i]);
+    }
+}
+
+int find(int parent[], int node) {
+    while (parent[node] != node)
+        node = parent[node];
+    return node;
+}
+
+void unionSets(int parent[], int x, int y) {
+    int rootX = find(parent, x);
+    int rootY = find(parent, y);
+    parent[rootX] = rootY;
+}
+
+void kruskalMST(pmatrix mat) {
+    int parent[mat->vertices];
+    int minEdgeCount = 0;
+
+    // Initialize parent array
+    for (int i = 0; i < mat->vertices; i++)
+        parent[i] = i;
+
+    printf("Edges in the Minimum Spanning Tree:\n");
+
+    while (minEdgeCount < mat->vertices - 1) {
+        int minWeight = INT_MAX;
+        int u, v;
+
+        for (int i = 0; i < mat->vertices; i++) {
+            for (int j = i + 1; j < mat->vertices; j++) {
+                if (mat->adjmat[i][j] && mat->adjmat[i][j] < minWeight) {
+                    int rootU = find(parent, i);
+                    int rootV = find(parent, j);
+                    if (rootU != rootV) {
+                        minWeight = mat->adjmat[i][j];
+                        u = i;
+                        v = j;
+                    }
+                }
+            }
+        }
+
+        int rootU = find(parent, u);
+        int rootV = find(parent, v);
+
+        if (rootU != rootV) {
+            unionSets(parent, u, v);
+            printf("(%d, %d) Weight: %d\n", u, v, minWeight);
+            minEdgeCount++;
+        }
+    }
+}
+
+void printmat(pmatrix mat) {
+    for (int i = 0; i < mat->vertices; i++) {
+        for (int j = 0; j < mat->vertices; j++) {
+            printf("%d ", mat->adjmat[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n\n");
+}
+
+int main() {
+    int n = 5;
+    int e = 6;
+
+    pmatrix mat = creatematrix(n);
+
+    for (int i = 0; i < e; i++) {
+        int src, dest, w;
+        printf("Enter edge %d src dest: ", i);
+        scanf("%d%d%d", &src, &dest, &w);
+        addedge(mat, src, dest, w);
+    }
+
+    printmat(mat);
+    BFS(mat, 0);
+    DFS(mat, 0);
+    Prims(mat);
+    dijkstras(mat);
+
+    return 0;
+}
