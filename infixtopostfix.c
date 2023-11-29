@@ -142,7 +142,7 @@ int main()
     gets(infix);
     InfixtoPostfix(infix, postfix);
     printf("\nPostfix Expression is %s\n", postfix);
-
+//(5 + 3) * 2 - 8 / 4
     double result = EvaluatePostfix(postfix);
     printf("Result: %f\n", result);
 
