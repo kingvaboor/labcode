@@ -2,35 +2,46 @@
 
 #define MAX_SIZE 10
 
+// Structure to represent two stacks in a single array
 struct TwoStacks
 {
     int arr[MAX_SIZE];
-    int top1;
-    int top2;
+    int top1; // Top index of Stack 1
+    int top2; // Top index of Stack 2
 };
 
+// Function to initialize the two stacks
 void initialize(struct TwoStacks *stacks)
 {
     stacks->top1 = -1;
     stacks->top2 = MAX_SIZE;
 }
 
+// Function to check if Stack 1 is full
 int isStack1Full(struct TwoStacks *stacks)
 {
     return stacks->top1 + 1 == stacks->top2;
 }
+
+// Function to check if Stack 2 is full
 int isStack2Full(struct TwoStacks *stacks)
 {
     return stacks->top2 - 1 == stacks->top1;
 }
+
+// Function to check if Stack 1 is empty
 int isStack1Empty(struct TwoStacks *stacks)
 {
     return stacks->top1 == -1;
 }
+
+// Function to check if Stack 2 is empty
 int isStack2Empty(struct TwoStacks *stacks)
 {
     return stacks->top2 == MAX_SIZE;
 }
+
+// Function to push an element onto Stack 1
 void pushStack1(struct TwoStacks *stacks, int value)
 {
     if (isStack1Full(stacks))
@@ -43,6 +54,7 @@ void pushStack1(struct TwoStacks *stacks, int value)
     }
 }
 
+// Function to push an element onto Stack 2
 void pushStack2(struct TwoStacks *stacks, int value)
 {
     if (isStack2Full(stacks))
@@ -55,6 +67,7 @@ void pushStack2(struct TwoStacks *stacks, int value)
     }
 }
 
+// Function to pop an element from Stack 1
 int popStack1(struct TwoStacks *stacks)
 {
     if (isStack1Empty(stacks))
@@ -68,6 +81,7 @@ int popStack1(struct TwoStacks *stacks)
     }
 }
 
+// Function to pop an element from Stack 2
 int popStack2(struct TwoStacks *stacks)
 {
     if (isStack2Empty(stacks))
@@ -81,6 +95,7 @@ int popStack2(struct TwoStacks *stacks)
     }
 }
 
+// Function to display the elements of Stack 1
 void displayStack1(struct TwoStacks *stacks)
 {
     printf("Stack 1: ");
@@ -91,6 +106,7 @@ void displayStack1(struct TwoStacks *stacks)
     printf("\n");
 }
 
+// Function to display the elements of Stack 2
 void displayStack2(struct TwoStacks *stacks)
 {
     printf("Stack 2: ");
@@ -101,6 +117,7 @@ void displayStack2(struct TwoStacks *stacks)
     printf("\n");
 }
 
+// Main function
 int main()
 {
     struct TwoStacks stacks;
